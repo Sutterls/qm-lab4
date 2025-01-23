@@ -1,9 +1,11 @@
+
 name: CI-CD
 
 on:
   push:
     branches:
       - master
+
 jobs:
   build:
     name: Checkout and build
@@ -16,11 +18,14 @@ jobs:
       - name: Download & Update sudo
         run: |
           sudo apt update && sudo apt install -y sudo
+
       - name: Install Docker
         run: |
           curl -sSL https://get.docker.com/ | sudo sh
+
       - name: Build Docker image
         working-directory: .
         run: |
           ls -l
           docker build -f lab4_quick/Dockerfile . -t lab4_quick
+
