@@ -1,26 +1,44 @@
-
-# Используем официальный образ .NET SDK для сборки приложения
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-
-# Устанавливаем рабочую директорию
+﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER $APP_UID
 WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
 
-# Копируем файл проекта и восстанавливаем зависимости
-COPY *.csproj ./
-RUN dotnet restore
-
-# Копируем остальные файлы и собираем приложение
-COPY . ./
-RUN dotnet publish -c Release -o out
-
-# Используем официальный образ .NET Runtime для запуска приложения
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
-
-# Устанавливаем рабочую директорию
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["lab4_quick/﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER $APP_UID
 WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
 
-# Копируем собранное приложение из предыдущего шага
-COPY --from=build /app/out .
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["lab4_quick/lab4_quick.csproj", "lab4_quick/"]
+RUN dotnet restore "lab4_quick/lab4_quick.csproj"
+COPY . .
+WORKDIR "/src/lab4_quick"
+RUN dotnet build "lab4_quick.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# Указываем, какой исполняемый файл запускать
-ENTRYPOINT ["dotnet", "lab4_quick.dll"] 
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "lab4_quick.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+RUN dotnet restore "lab4_quick/lab4_quick.csproj"
+COPY . .
+WORKDIR "/src/ItsRandomLife"
+RUN dotnet build "lab4_quick.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "lab4_quick.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "lab4_quick.dll"]
