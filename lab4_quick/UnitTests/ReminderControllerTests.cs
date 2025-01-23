@@ -12,9 +12,9 @@ namespace lab4_quick.UnitTests
     [TestClass]
     public class ReminderControllerTests
     {
-        private Mock<IReminderService> _serviceMock;
-        private Mock<ILogger<ReminderController>> _loggerMock;
-        private ReminderController _controller;
+        private Mock<IReminderService> _serviceMock = null!;
+        private Mock<ILogger<ReminderController>> _loggerMock = null!;
+        private ReminderController _controller = null!;
 
         [TestInitialize]
         public void Setup()
@@ -49,7 +49,7 @@ namespace lab4_quick.UnitTests
         public async Task GetReminderById_NotFound()
         {
             var reminderId = Guid.NewGuid();
-            _serviceMock.Setup(x => x.GetReminderByIdAsync(reminderId)).ReturnsAsync((Reminder)null);
+            _serviceMock.Setup(x => x.GetReminderByIdAsync(reminderId)).ReturnsAsync(value: null as Reminder);
 
             var result = await _controller.GetReminderById(reminderId);
 
@@ -79,8 +79,8 @@ namespace lab4_quick.UnitTests
             var meetingId = Guid.NewGuid();
             var reminders = new List<Reminder>
             {
-                new Reminder { Id = Guid.NewGuid(), MeetingId = meetingId, ReminderTime = DateTime.Now },
-                new Reminder { Id = Guid.NewGuid(), MeetingId = meetingId, ReminderTime = DateTime.Now.AddMinutes(10) }
+                new() { Id = Guid.NewGuid(), MeetingId = meetingId, ReminderTime = DateTime.Now },
+                new() { Id = Guid.NewGuid(), MeetingId = meetingId, ReminderTime = DateTime.Now.AddMinutes(10) }
             };
 
             _serviceMock.Setup(x => x.GetAllRemindersByMeetingIdAsync(meetingId)).ReturnsAsync(reminders);
