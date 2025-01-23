@@ -3,7 +3,7 @@ name: CI-CD
 on:
   push:
     branches:
-      - master
+      - lab5
 jobs:
   build:
     name: Checkout and build
@@ -23,4 +23,4 @@ jobs:
         working-directory: .
         run: |
           ls -l
-          docker build -f quickmeetingsapi/Dockerfile . -t quickmeetingsapi
+          docker build -f lab4_quick/Dockerfile . -t lab4_quick
