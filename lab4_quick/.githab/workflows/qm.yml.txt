@@ -3,7 +3,7 @@ name: CI-CD
 on:
   push:
     branches:
-      - lab5
+      - master
 jobs:
   build:
     name: Checkout and build
